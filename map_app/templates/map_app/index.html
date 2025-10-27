@@ -3,45 +3,102 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Google Map</title>
+    <title>Карта с моим местоположением</title>
     <link rel="manifest" href="{% static 'manifest.json' %}">
     <meta name="theme-color" content="#1976d2">
     <link rel="icon" href="{% static 'icons/icon-192x192.png' %}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
       html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
+        height: 100%;
+        margin: 0;
+        padding: 0;
       }
       #map {
-        height: 100vh; 
+        height: 100vh;
         width: 100%;
       }
+      #locate-btn {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 5;
+        background: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 15px;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      }
+      #locate-btn:hover {
+        background: #f1f1f1;
+      }
     </style>
-  <script
-  src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&callback=initMap"
-  async
-  defer
-></script>
-    <script>
-      function initMap() {
-        const center = { lat: 43.238949, lng: 76.889709 };
-        const map = new google.maps.Map(document.getElementById("map"), {
-          zoom: 10,
-          center: center,
-        });
-        new google.maps.Marker({
-          position: center,
-          map: map,
-        });
-      }
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("{% static 'service-worker.js' %}");
-      }
-    </script>
   </head>
   <body>
+    <button id="locate-btn">📍 Моё местоположение</button>
     <div id="map"></div>
+
+    <script>
+      let map;
+      let userMarker;
+
+      function initMap() {
+        const center = { lat: 43.238949, lng: 76.889709 }; // Алматы
+        map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 12,
+          center: center,
+        });
+
+        const marker = new google.maps.Marker({
+          position: center,
+          map: map,
+          title: "Алматы",
+        });
+
+        // Обработка кнопки "Моё местоположение"
+        document.getElementById("locate-btn").addEventListener("click", () => {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const userPos = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude,
+                };
+
+                if (userMarker) {
+                  userMarker.setMap(null);
+                }
+
+                userMarker = new google.maps.Marker({
+                  position: userPos,
+                  map: map,
+                  title: "Вы здесь",
+                  icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 8,
+                    fillColor: "#4285F4",
+                    fillOpacity: 1,
+                    strokeWeight: 2,
+                    strokeColor: "#ffffff",
+                  },
+                });
+
+                map.setCenter(userPos);
+                map.setZoom(14);
+              },
+              () => {
+                alert("⚠️ Разрешите использование геолокации, чтобы определить ваше местоположение.");
+              }
+            );
+          } else {
+            alert("Ваш браузер не поддерживает геолокацию.");
+          }
+        });
+      }
+    </script>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&callback=initMap"></script>
   </body>
 </html>
