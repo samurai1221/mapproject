@@ -1,8 +1,12 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
     <title>Google Map</title>
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#1976d2">
+    <link rel="icon" href="{% static 'icons/icon-192x192.png' %}">
     <style>
       #map {
         height: 100vh;
@@ -25,6 +29,9 @@
           position: center,
           map: map,
         });
+      }
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("{% static 'service-worker.js' %}");
       }
     </script>
   </head>
