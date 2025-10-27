@@ -7,9 +7,15 @@
     <link rel="manifest" href="{% static 'manifest.json' %}">
     <meta name="theme-color" content="#1976d2">
     <link rel="icon" href="{% static 'icons/icon-192x192.png' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+      html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      }
       #map {
-        height: 100vh;
+        height: 100vh; 
         width: 100%;
       }
     </style>
