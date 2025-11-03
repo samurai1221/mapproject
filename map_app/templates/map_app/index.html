@@ -106,14 +106,15 @@
     <script>
   let deferredPrompt;
 
+  // Событие, когда браузер обнаружил, что PWA можно установить
   window.addEventListener('beforeinstallprompt', (e) => {
-    // Блокируем стандартное всплывающее окно
-    e.preventDefault();
+    console.log('[PWA] beforeinstallprompt event fired');
+    e.preventDefault(); // Блокируем стандартный баннер
     deferredPrompt = e;
 
-    // Показываем свою кнопку / сообщение
-    const installBanner = document.createElement('div');
-    installBanner.innerHTML = `
+    // Создаём баннер с кнопкой
+    const banner = document.createElement('div');
+    banner.innerHTML = `
       <div style="
         position: fixed;
         bottom: 20px;
@@ -121,41 +122,60 @@
         transform: translateX(-50%);
         background: #317EFB;
         color: white;
-        padding: 12px 20px;
+        padding: 14px 22px;
         border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        font-family: sans-serif;
-        z-index: 1000;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        font-family: system-ui, sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 2000;
       ">
         <span>Добавить приложение на главный экран?</span>
         <button id="install-btn" style="
           background: white;
           color: #317EFB;
           border: none;
-          margin-left: 10px;
-          padding: 6px 12px;
+          padding: 6px 14px;
           border-radius: 6px;
-          cursor: pointer;
           font-weight: 600;
+          cursor: pointer;
         ">Установить</button>
       </div>
     `;
-    document.body.appendChild(installBanner);
+    document.body.appendChild(banner);
+
+    console.log('[PWA] Custom install banner shown');
 
     const installBtn = document.getElementById('install-btn');
     installBtn.addEventListener('click', async () => {
-      installBanner.remove(); // убираем баннер
-      deferredPrompt.prompt(); // вызываем системное окно установки
+      console.log('[PWA] Install button clicked');
+      banner.remove();
 
-      const choiceResult = await deferredPrompt.userChoice;
-      if (choiceResult.outcome === 'accepted') {
-        console.log('Пользователь установил приложение');
+      deferredPrompt.prompt(); // Показываем системное окно установки
+      const { outcome } = await deferredPrompt.userChoice;
+
+      if (outcome === 'accepted') {
+        console.log('[PWA] Пользователь подтвердил установку приложения');
       } else {
-        console.log('Пользователь отклонил установку');
+        console.log('[PWA] Пользователь отказался от установки');
       }
+
       deferredPrompt = null;
     });
   });
+
+  // Событие, когда приложение установлено
+  window.addEventListener('appinstalled', () => {
+    console.log('[PWA] Приложение установлено!');
+  });
+
+  // Дополнительно можно проверить, уже ли оно установлено
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    console.log('[PWA] Приложение запущено как установленное');
+  } else {
+    console.log('[PWA] Запущено как веб-страница (не установлено)');
+  }
 </script>
 
   </body>
