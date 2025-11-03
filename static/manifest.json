@@ -1,10 +1,11 @@
 {
-  "name": "Google Map App",
-  "short_name": "MapApp",
+  "name": "Map Project",
+  "short_name": "Map",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#1976d2",
+  "theme_color": "#317EFB",
   "icons": [
     {
       "src": "/static/icons/icon-192x192.png",
