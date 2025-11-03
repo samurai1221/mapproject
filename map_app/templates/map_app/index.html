@@ -103,6 +103,60 @@
       src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&callback=initMap"
       async defer>
     </script>
+    <script>
+  let deferredPrompt;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Блокируем стандартное всплывающее окно
+    e.preventDefault();
+    deferredPrompt = e;
+
+    // Показываем свою кнопку / сообщение
+    const installBanner = document.createElement('div');
+    installBanner.innerHTML = `
+      <div style="
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #317EFB;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        font-family: sans-serif;
+        z-index: 1000;
+      ">
+        <span>Добавить приложение на главный экран?</span>
+        <button id="install-btn" style="
+          background: white;
+          color: #317EFB;
+          border: none;
+          margin-left: 10px;
+          padding: 6px 12px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: 600;
+        ">Установить</button>
+      </div>
+    `;
+    document.body.appendChild(installBanner);
+
+    const installBtn = document.getElementById('install-btn');
+    installBtn.addEventListener('click', async () => {
+      installBanner.remove(); // убираем баннер
+      deferredPrompt.prompt(); // вызываем системное окно установки
+
+      const choiceResult = await deferredPrompt.userChoice;
+      if (choiceResult.outcome === 'accepted') {
+        console.log('Пользователь установил приложение');
+      } else {
+        console.log('Пользователь отклонил установку');
+      }
+      deferredPrompt = null;
+    });
+  });
+</script>
 
   </body>
 </html>
